@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: ecom_social_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: ecom_social
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ../database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    networks:
+      - ecom_social_network
+
+  backend:
+    build: ../backend
+    container_name: ecom_social_backend
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - DB_HOST=mysql
+      - DB_USER=user
+      - DB_PASSWORD=password
+      - DB_NAME=ecom_social
+      - JWT_SECRET=your_jwt_secret
+      - GOOGLE_CLIENT_ID=your_google_client_id
+      - GOOGLE_CLIENT_SECRET=your_google_client_secret
+      - EMAIL_USER=your_email@gmail.com
+      - EMAIL_PASS=your_email_password
+      - TWILIO_SID=your_twilio_sid
+      - TWILIO_AUTH_TOKEN=your_twilio_auth_token
+      - TWILIO_PHONE_NUMBER=your_twilio_phone_number
+    depends_on:
+      - mysql
+    networks:
+      - ecom_social_network
+
+  frontend:
+    build: ../frontend
+    container_name: ecom_social_frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - ecom_social_network
+
+volumes:
+  mysql_data:
+
+networks:
+  ecom_social_network:

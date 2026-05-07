@@ -1,0 +1,4 @@
+ram 4gb
+16gb rom
+200gb external
+32gb bandwidth
